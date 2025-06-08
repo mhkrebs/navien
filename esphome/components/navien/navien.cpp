@@ -11,6 +11,7 @@ namespace navien {
 static const char *TAG = "navien.sensor";
 
 void Navien::setup() {
+  /*
   ESP_LOGCONFIG(TAG, "Setting rs485 into receive mode");
   // Set the rs485 into receive mode
   pinMode(D5, OUTPUT);
@@ -20,6 +21,7 @@ void Navien::setup() {
   ESP_LOGCONFIG(TAG, "Activating TTL/CMOS buffer");
   pinMode(D6, OUTPUT);
   digitalWrite(D6, HIGH);
+   */
 }
 
 void Navien::update() {
@@ -223,7 +225,7 @@ void Navien::loop() {
   }
 }
 
-void Navien::send_cmd(const uint8_t * buffer, uint8 len){
+void Navien::send_cmd(const uint8_t * buffer, uint8_t len){
   if (buffer && len)
     this->write_array(buffer, len);
 }
@@ -316,6 +318,7 @@ uint8_t Navien::checksum(const uint8_t * buffer, uint8_t len, uint16_t seed){
   return result;
 }
 
+#ifdef USE_SWITCH
 void NavienOnOffSwitch::setup() {
   ESP_LOGCONFIG(TAG, "Setting up Switch '%s'...", this->name_.c_str());
 
@@ -344,6 +347,7 @@ void NavienOnOffSwitch::write_state(bool state) {
 void NavienOnOffSwitch::dump_config(){
     ESP_LOGCONFIG(TAG, "Empty custom switch");
 }
+#endif
   
 }  // namespace navien
 }  // namespace esphome
