@@ -1,0 +1,146 @@
+esphome:
+  name: "hot-water-heater"
+  friendly_name: Hot Water Heater
+
+esp32:
+  board: esp32-c6-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+  # baud_rate: 0 #disable logging over uart
+  # 2025-05-23: baud_rate: 9600 #disable logging over uart
+  # hardware_uart: UART1 # redirect logs to UART1 GPIO2 to avoid conflicts
+  #                      # with the MCU communication through the main hardware UART
+  # https://esphome.io/components/logger
+  # level: VERBOSE #makes uart stream available in esphome logstream
+  # level: VERY_VERBOSE
+  # level: DEBUG
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "h33v3CeN1TIb5e+olDQ6rRzQHYU/wr01JbbP8xVrJTM="
+
+ota:
+  - platform: esphome
+    password: "3eddfefed13db32afdee8d928f43e45e"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Initial Fallback Hotspot"
+    password: "u36HPEl0FgEu"
+
+captive_portal:
+    
+
+# Reference (2025-02-02): https://github.com/htumanyan/navien/blob/74792e258f2465cf51190c11736d564519c3aae4/esphome/navien.yml
+external_components:
+  - source: 
+      type: local
+      path: .
+    components: [navien]
+
+# MCODE(2025-05-26): Without this: works.
+# MCODE(2025-05-26): With this, inverted=false: works.
+# MCODE(2025-05-26): With this, inverted=true: does not work.
+# MCODE(2025-05-26): Without this and following inverted=true: does not work.
+# MCODE(2025-05-27): With this, san inverted (inverted=false): works.
+# MCODE(2025-05-27): Without this and following inverted=false: works.
+output:
+  - platform: gpio
+    pin: GPIO2  # Replace GPIO5 with your enable pin
+    id: uart_enable_output
+    # inverted: false #Set inverted to true for active-low
+
+uart:
+  # rx_pin:
+  #   # number: GPIO4
+  #   number: GPIO7
+  #   mode:
+  #     input: true
+  #     pullup: false
+
+  rx_pin: GPIO23
+  tx_pin: GPIO22
+  # rx_pin:
+  #   number: GPIO23
+  #   mode:
+  #     input: true
+  #     pullup: false
+  # tx_pin:
+  #   number: GPIO22
+  #   mode:
+  #     output: true
+  #     pullup: true
+
+##  tx_pin: TX
+##  rx_pin: RX
+#  tx_pin: GPIO15
+##  rx_pin: GPIO13
+#  rx_pin:
+#    number: GPIO13
+#    mode:
+#      input: true
+#      pullup: false
+      
+  baud_rate: 19200
+  stop_bits: 1
+  parity: none
+  rx_buffer_size: 8192
+  id: main_hw_uart
+  # debug:
+    # MCODE(2025-05-27): This didn't seem to work.  The output was just the raw bytes with or without these settings.
+    # # dummy_receiver: false
+    # after:
+    #   delimiter: "\n"
+    # sequence:
+    #   - lambda: UARTDebug::log_string(direction, bytes);
+
+text_sensor:
+  - platform: version
+    name: ESPHome Version
+    id: esphome_version
+    hide_timestamp: True
+  - platform: wifi_info
+    ip_address:
+      id: ip_address
+      name: IP Address
+    mac_address:
+      name: Mac
+      id: mac_address
+
+sensor:
+  - platform: uptime
+    name: Uptime Sensor
+  - platform: wifi_signal
+    name: WiFi Signal
+  - platform: navien
+    name: Test sensor
+    uart_id: main_hw_uart
+    target_temperature:
+      name: Target Temp
+      filters:
+        - lambda: return x * (9.0/5.0) + 32.0;
+      unit_of_measurement: "°F"
+    inlet_temperature:
+      name: Inlet Temp
+      filters:
+        - lambda: return x * (9.0/5.0) + 32.0;
+      unit_of_measurement: "°F"
+    outlet_temperature:
+      name: Outlet Temp
+      filters:
+        - lambda: return x * (9.0/5.0) + 32.0;
+      unit_of_measurement: "°F"
+    water_flow:
+      name: Water Flow
+      filters:
+        - lambda: return x / 3.785;
+      unit_of_measurement: "GPM"
+
