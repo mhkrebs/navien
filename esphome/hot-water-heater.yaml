@@ -43,7 +43,7 @@ captive_portal:
 external_components:
   - source: 
       type: local
-      path: .
+      path: components
     components: [navien]
 
 # MCODE(2025-05-26): Without this: works.
