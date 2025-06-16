@@ -37,11 +37,11 @@ wifi:
     password: "u36HPEl0FgEu"
 
 captive_portal:
-    
+
 
 # Reference (2025-02-02): https://github.com/htumanyan/navien/blob/74792e258f2465cf51190c11736d564519c3aae4/esphome/navien.yml
 external_components:
-  - source: 
+  - source:
       type: local
       path: components
     components: [navien]
@@ -88,7 +88,7 @@ uart:
 #    mode:
 #      input: true
 #      pullup: false
-      
+
   baud_rate: 19200
   stop_bits: 1
   parity: none
@@ -143,4 +143,29 @@ sensor:
       filters:
         - lambda: return x / 3.785;
       unit_of_measurement: "GPM"
+    current_gas_usage:
+      name: Current Gas Usage
+      icon: mdi:gas-burner
+      # device_class: energy
+      # state_class: measurement
+      # Convert from thermochemical (assumed) kcal to International Table
+      # (assumed) BTU.
+      filters:
+        - multiply: 3.9656668314
+        # - lambda: return x * 3.9656668314;
+      unit_of_measurement: "BTU"
+    accumulated_gas_usage:
+      # MDB(2025-06-15): DO NOT SUBMIT: Went down from 2320.17358 to 2295.45 when I unplugged the hot water heater and plugged it back in.  I think that means that neither "total" nor
+      # "total_increasing" will work. :(  If this turns out to be true (i.e. I didn't misread the numbers), then maybe "last_reset" can be used with the uptime sensor.
+      name: Accumulated Gas Usage
+      icon: mdi:meter-gas
+      # device_class: gas
+      # state_class: total
+      # Convert from cubic meters to cubic feet.  This doesn't convert to therms
+      # since that depends on the heating values/therm factors, which vary based
+      # on the source of the gas.
+      filters:
+        - multiply: 35.31466672
+        # - lambda: return x * 35.31466672;
+      unit_of_measurement: "ft³"
 
