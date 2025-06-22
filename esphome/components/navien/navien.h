@@ -185,20 +185,6 @@ typedef enum _DEVICE_POWER_STATE{
 } DEVICE_POWER_STATE;
   
 typedef struct{
-  struct{
-    uint8_t set_temp;
-    uint8_t outlet_temp;
-    uint8_t inlet_temp;
-    float flow_lpm;
-  } water;
-  struct{
-    uint8_t  set_temp;
-    uint8_t  outlet_temp;
-    uint8_t  inlet_temp;
-    uint16_t accumulated_gas_usage;
-    uint16_t current_gas_usage;
-  } gas;
-
   uint16_t           controller_version;
   uint16_t           panel_version;
   DEVICE_POWER_STATE power;
